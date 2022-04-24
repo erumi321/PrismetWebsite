@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/universal.css">
     <link rel="stylesheet" href="css/game.css">
+
+
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-auth.js"></script>
@@ -13,16 +15,70 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-functions.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-storage.js"></script>
-    <script src="js/universal.js"></script>
-    <script src="js/game.js"></script>
+  <script src="https://unpkg.com/roll-a-die@2.0.1/dist/roll-a-die.js"></script>
+
     <title>Prismet</title>
 </head>
 <body onload="GetGameID()">
+    
     <div class="waiting--container" id="waiting--container">
         <p id="Title">Welcome to your game </p>
     </div>
     <div class="game--container hidden" id="game--container">
         <h1 id="Game--Title">LETS PLAY</h1>
+        <div id="clientside--container">
+            <div id="interact--container" class="interact--container">
+                <button class="rolldice--button" id="rolldice--button" onclick="RollDice(this)">Roll Dice</button>
+                <div id="buff--container" class="buff--container">
+                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    </div>
+                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    </div>
+                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    </div>
+                </div>
+                <div id="dragon--container" class="dragon--container">
+                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                    </div>
+                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                    </div>
+                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                    </div>
+                </div>
+                <button class="hidden" id="confirm--dice--btn" onclick="ConfirmDice(this)">
+                    Confirm Dice 
+                </button>
+            </div>   
+        </div>
+        <div id="opponentside--container">
+            <div id="opp--interact--container" class="interact--container">
+                <button class="rolldice--button" style="visibility:hidden">Roll Dice</button>
+                <div id="opp--buff--container" class="buff--container">
+                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    </div>
+                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    </div>
+                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    </div>
+                </div>
+                <div id="opp--dragon--container" class="dragon--container">
+                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                    </div>
+                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                    </div>
+                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                    </div>
+                </div>
+            </div>   
+        </div>
+        <div id="victory--container" class="victory--container hidden">
+            <h1 class="victory--title" id="victory--title">PLAYER WON</h1>
+            <button class="go--again" id="go--again" onclick="StartOverGame()">Play Again</button>
+        </div>
     </div>
+
+    <script src="gameConfig.js"></script>
+    <script src="js/universal.js"></script>
+    <script src="js/game.js"></script>
 </body>
 </html>

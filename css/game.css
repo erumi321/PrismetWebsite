@@ -1,0 +1,100 @@
+.rollButton
+{
+    display: inline-block;
+}
+
+.button--column {
+    display: inline-block
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+
+.drop-zone {
+    width: 100px;
+    height: 100px;
+    margin-right: 10px;
+    margin-top: 10px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 8px dashed black;
+}
+
+.drop-zone--over { 
+    opacity: 0.5
+}
+
+.draggableDie {
+    width: 50px;
+    height: 50px;
+    border: 3px dashed black;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+}
+
+.draggableDie p {
+    margin-top: 0;
+}
+
+
+.buff--container {
+    display: inline-block;
+}
+
+.interact--container {
+    position: relative;
+    float: left;
+    left: calc(50vw - 145.5px);
+    align-content: center;
+    justify-content: center;
+    justify-items: center;
+}
+
+.dragon--container {
+    margin-left: 35px;
+    display: inline-block;
+}
+
+#confirm--dice--btn{
+    display: block;
+    margin: 30px auto 0 auto;
+}
+
+#clientside--container {
+    position: absolute;
+    left: 0%;
+    transition: left 1.5s ease-in-out;
+}
+#opponentside--container {
+    position: absolute;
+    left: 15%;
+    transition: opacity 1.5s ease-in-out;
+    opacity: 0;
+}
+.leftAdjust{
+    left: -15% !important;
+}
+.rolldice--button {
+    display: block;
+    margin: 0 auto 30px auto;
+}
+
+.victory--container {
+    position: fixed;
+    top: 55%;
+    width: 100vw;
+    text-align: center;
+}
+
+.victory--title {
+    flex: left;
+    margin: 0 auto 0 auto;
+}

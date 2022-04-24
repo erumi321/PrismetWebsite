@@ -5,6 +5,8 @@ function CreatePrivateGame()
         timeCreated: date.getTime(),
         player1Joined: false,
         player2Joined: false,
+        player1Rematch: false,
+        player2Rematch: false,
         p1Dice: {
             Dragons: [
 
@@ -20,7 +22,10 @@ function CreatePrivateGame()
             Buffs: [
 
             ]
-        }
+        },
+        Points: [
+
+        ]
     };
     db.collection("games").add(newGame)
     .then((doc)=>{
