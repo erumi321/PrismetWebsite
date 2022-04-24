@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/universal.css">
-    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/game.css">
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-auth.js"></script>
@@ -14,12 +14,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-functions.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-storage.js"></script>
     <script src="js/universal.js"></script>
-    <script src="js/index.js"></script>
+    <script src="js/game.js"></script>
     <title>Prismet</title>
 </head>
-<body>
-    <p>Welcome to Prismet</p>
-    <button id="CreatePrivateGame" onclick="CreatePrivateGame()">Create Game</button>
-    <button id="CreatePrivateGame" onclick="JoinGame()">Create Game</button>
+<body onload="GetGameID()">
+    <div class="waiting--container" id="waiting--container">
+        <p id="Title">Welcome to your game </p>
+    </div>
+    <div class="game--container hidden" id="game--container">
+        <h1 id="Game--Title">LETS PLAY</h1>
+    </div>
 </body>
 </html>
