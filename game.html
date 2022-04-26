@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/universal.css">
     <link rel="stylesheet" href="css/game.css">
 
+    <link rel="stylesheet" href="css/universal.css">
 
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
@@ -29,45 +29,81 @@
         <div id="clientside--container">
             <div id="interact--container" class="interact--container">
                 <button class="rolldice--button" id="rolldice--button" onclick="RollDice(this)">Roll Dice</button>
-                <div id="buff--container" class="buff--container">
-                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                <div id="set--cotainer--1" class="set--container">
+                    <p id="Dragonvalue--1" class="Dragonvalue" style="margin-top: 0;">0</p>
+                    <div id="Buffzone--1--2" class="buffzone drop-zone" style="border-color: #31cfde;" dragIndex = "1">
                     </div>
-                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    <div id="Dragonzone--1" class="dragonzone drop-zone" style="border-color: #DE4031;">
                     </div>
-                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    <div id="Buffzone--1--3" class="buffzone drop-zone" style="border-color: #31cfde;" dragIndex = "1">
                     </div>
-                </div>
-                <div id="dragon--container" class="dragon--container">
-                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
-                    </div>
-                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
-                    </div>
-                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                    <div id="Buffzone--1--1" class="buffzone drop-zone" style="border-color: #31cfde; display: flex; margin-left: 4.5vw;"  dragIndex = "1">
                     </div>
                 </div>
-                <button class="hidden" id="confirm--dice--btn" onclick="ConfirmDice(this)">
-                    Confirm Dice 
+                <div id="set--cotainer--2" class="set--container">
+                    <p id="Dragonvalue--2" class="Dragonvalue" style="margin-top: 0;">0</p>
+                    <div id="Buffzone--2--2" class="buffzone drop-zone" style="border-color: #31cfde;"  dragIndex = "2">
+                    </div>
+                    <div id="Dragonzone--2" class="dragonzone drop-zone" style="border-color: #DE4031;">
+                    </div>
+                    <div id="Buffzone--2--3" class="buffzone drop-zone" style="border-color: #31cfde;" dragIndex = "2">
+                    </div>
+                    <div id="Buffzone--2--1" class="buffzone drop-zone" style="border-color: #31cfde; display: flex; margin-left: 4.5vw;"dragIndex = "2">
+                    </div>
+                </div>
+                <div id="set--cotainer--3" class="set--container">
+                    <p id="Dragonvalue--3" class="Dragonvalue" style="margin-top: 0;">0</p>
+                    <div id="Buffzone--3--2" class="buffzone drop-zone" style="border-color: #31cfde;" dragIndex = "3">
+                    </div>
+                    <div id="Dragonzone--3" class="dragonzone drop-zone" style="border-color: #DE4031;">
+                    </div>
+                    <div id="Buffzone--3--3" class="buffzone drop-zone" style="border-color: #31cfde;"  dragIndex = "3">
+                    </div>
+                    <div id="Buffzone--3--1" class="buffzone drop-zone" style="border-color: #31cfde; display: flex; margin-left: 4.5vw;" dragIndex = "3"> 
+                    </div>
+                </div>
+                <button class="" id="confirm--dice--btn" onclick="ConfirmDice(this)">
+                    Confirm Dice
                 </button>
             </div>   
         </div>
         <div id="opponentside--container">
             <div id="opp--interact--container" class="interact--container">
                 <button class="rolldice--button" style="visibility:hidden">Roll Dice</button>
-                <div id="opp--buff--container" class="buff--container">
-                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                <div id="opp--set--cotainer--1" class="set--container">
+                    <div id="opp--Buffzone--1--1" class="buffzone drop-zone" style="border-color: #31cfde;  display: flex; margin-left: 4.5vw;">
                     </div>
-                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    <div id="opp--Buffzone--1--2" class="buffzone drop-zone" style="border-color: #31cfde;">
                     </div>
-                    <div class="drop-zone" style="border-color: #31cfde;" dragValue="Buff">
+                    <div id="opp--Dragonzone--1" class="dragonzone drop-zone" style="border-color: #DE4031;">
                     </div>
+                    <div id="opp--Buffzone--1--3" class="buffzone drop-zone" style="border-color: #31cfde;">
+                    </div>
+                    <p id="opp--Dragonvalue--1" class="Dragonvalue" style="margin-bottom: 0;">0</p>
                 </div>
-                <div id="opp--dragon--container" class="dragon--container">
-                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                <div id="opp--set--cotainer--2" class="set--container">
+                    <div id="opp--Buffzone--2--1" class="buffzone drop-zone" style="border-color: #31cfde; display: flex; margin-left: 4.5vw;">
                     </div>
-                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+
+                    <div id="opp--Buffzone--2--2" class="buffzone drop-zone" style="border-color: #31cfde;">
                     </div>
-                    <div class="drop-zone" style="border-color: #DE4031;" dragValue="Dragon">
+                    <div id="opp--Dragonzone--2" class="dragonzone drop-zone" style="border-color: #DE4031;">
                     </div>
+                    <div id="opp--Buffzone--2--3" class="buffzone drop-zone" style="border-color: #31cfde;">
+                    </div>
+                    <p id="opp--Dragonvalue--2" class="Dragonvalue" style="margin-bottom: 0;">0</p>
+                </div>
+                <div id="opp--set--cotainer--3" class="set--container">
+                    <div id="opp--Buffzone--3--1" class="buffzone drop-zone" style="border-color: #31cfde; display: flex; margin-left: 4.5vw;">
+                    </div>
+
+                    <div id="opp--Buffzone--3--2" class="buffzone drop-zone" style="border-color: #31cfde;">
+                    </div>
+                    <div id="opp--Dragonzone--3" class="dragonzone drop-zone" style="border-color: #DE4031;">
+                    </div>
+                    <div id="opp--Buffzone--3--3" class="buffzone drop-zone" style="border-color: #31cfde;">
+                    </div>
+                    <p id="opp--Dragonvalue--3" class="Dragonvalue" style="margin-bottom: 0;">0</p>
                 </div>
             </div>   
         </div>

@@ -1,3 +1,13 @@
+* {
+    -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+                user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
+
 .rollButton
 {
     display: inline-block;
@@ -13,83 +23,102 @@
     gap: 10px;
   }
 
-
-.drop-zone {
-    width: 100px;
-    height: 100px;
-    margin-right: 10px;
-    margin-top: 10px;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 8px dashed black;
-}
-
 .drop-zone--over { 
     opacity: 0.5
 }
 
 .draggableDie {
-    width: 50px;
-    height: 50px;
-    border: 3px dashed black;
+    position: absolute;
+    width: 1.5vw;
+    height: 1.5vw;
+    border: 0.18vw dashed black;
     text-align: center;
     align-items: center;
     justify-content: center;
-    font-size: 3em;
+    font-size: 1.5em;
 }
 
 .draggableDie p {
-    margin-top: 0;
+    margin: 0;
 }
 
+.Buffzone--container {
+    display: block;
+    margin-left: -130px;
+}
 
-.buff--container {
-    display: inline-block;
+.buffzone {
+    width: 3vw;
+    height: 3vw;
+    margin-right: 0.3vw;
+    margin-top: 0.3vw;
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0.48vw dashed black;
+
+}
+
+.dragonzone {
+    width: 3vw;
+    height: 3vw;
+    margin-right: 0.3vw;
+    margin-top: 0.3vw;
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0.48vw dashed black;
 }
 
 .interact--container {
-    position: relative;
-    float: left;
-    left: calc(50vw - 145.5px);
+    overflow:visible;
+
     align-content: center;
     justify-content: center;
     justify-items: center;
 }
 
-.dragon--container {
+.set--container {
     margin-left: 35px;
     display: inline-block;
 }
 
 #confirm--dice--btn{
-    display: block;
-    margin: 30px auto 0 auto;
+    display: inline-block;
+    position: absolute;
+    top: 119px;
+    width: 100px;
+    margin-left: 10px;
 }
 
 #clientside--container {
     position: absolute;
-    left: 0%;
+    float: left;
+    left: 22.727864583vw;
+    top: 50vh;
     transition: left 1.5s ease-in-out;
 }
 #opponentside--container {
     position: absolute;
-    left: 15%;
+    left: 22.727864583vw;
+    top: 15vh;
     transition: opacity 1.5s ease-in-out;
-    opacity: 0;
+    opacity: 100;
 }
-.leftAdjust{
-    left: -15% !important;
-}
+
 .rolldice--button {
-    display: block;
-    margin: 0 auto 30px auto;
+    display: inline-block;
+    position: absolute;
+    top: 119px;
+    left: -69.34px;
 }
 
 .victory--container {
     position: fixed;
-    top: 55%;
+    top: calc(50% - 8.05555555556vh);
+    left: 33vw;
     width: 100vw;
     text-align: center;
 }
@@ -97,4 +126,10 @@
 .victory--title {
     flex: left;
     margin: 0 auto 0 auto;
+}
+
+.Dragonvalue {
+    text-align: center;
+    font-size: 1.75em;
+    margin-left: -0.5vw;
 }

@@ -12,11 +12,7 @@ function GetGameID()
 
     document.getElementById("Title").innerHTML = "You are player: " + playerNum + "<br>Send this link to your friend: <a href='" + newPlayerLink + "'>" + newPlayerLink + "</a>";
 
-    let playerField = "player" + playerNum + "Joined";
 
-    db.collection("games").doc(gameID).update({
-        [playerField]: true
-    });
 
     db.collection("games").doc(gameID)
     .onSnapshot((doc) => {
@@ -31,6 +27,15 @@ function GetGameID()
 
 function onSnapshot(doc) {
     console.log("Current data: ", doc.data());
+   
+    let playerField = "player" + playerNum + "State";
+
+    if (doc.data()[playerField] == 0){
+
+        db.collection("games").doc(gameID).update({
+            [playerField]: 1
+        });
+    }
 
     checkGameRematch(doc);
     if(!gameStarted){
@@ -40,47 +45,56 @@ function onSnapshot(doc) {
     }
 }
 
+function calculateDragonScore(dragon){
+    let dragonValue = dragon.Value;
+    let buffValue = 0;
+    
+    for (var x = 1; x <= 3; x++){
+        let buff = dragon["Buff" + x];
+        if (buff == -1){
+            continue; 
+        }
+        let multiplier = (buff % 2 != dragonValue % 2)? 1: gameConfig.SimilarityMultiplier; 
+        buffValue += buff * multiplier;
+    }
+    
+    let score = dragonValue + buffValue;
+
+    return score
+}
+
 function checkGameBehaviour(doc){
     let p1Dice = doc.data().p1Dice;
     let p2Dice = doc.data().p2Dice;
 
-    if (p1Dice.Dragons[2] != undefined && p2Dice.Dragons[2] != undefined){
+    let playerStateField = "player" + playerNum + "State";
+    if (doc.data()[playerStateField] == 2){
+        populatePlayerDice(playerNum == 1? p1Dice: p2Dice);
+    }
+
+    let oppStateField = "player" + (playerNum == 1? 2: 1) + "State";
+    if (doc.data()[oppStateField] == 2 && doc.data()[playerStateField] == 2){
+        populateOpponentDice(playerNum == 1? p2Dice: p1Dice);
+    }
+
+    if (doc.data().player1State == 2 && doc.data().player2State == 2){
         let points = [0, 0];
         
-        populateOpponentDice(playerNum == 1? p2Dice: p1Dice);
 
-        populatePlayerDice(playerNum == 1? p1Dice: p2Dice);
-       
-        document.getElementById("clientside--container").classList.add("leftAdjust");
 
         for(var i = 0; i < 3; i++){
-            let p1DragonValue = p1Dice.Dragons[i];
-            let p1BuffValue = p1Dice.Buffs[i];
-            
-            let p2DragonValue = p2Dice.Dragons[i];
-            let p2BuffValue = p2Dice.Buffs[i];
-
-            let p1Multiplier = (p1BuffValue % 2 != p1DragonValue % 2)? 1: gameConfig.SimilarityMultiplier; 
-            let p2Multiplier = (p2BuffValue % 2 != p2DragonValue % 2)? 1: gameConfig.SimilarityMultiplier; 
-            
-            let p1Score = p1DragonValue + (p1BuffValue * p1Multiplier);
-            let p2Score = p2DragonValue + (p2BuffValue * p2Multiplier);
-
-            console.log(p1Score, p2Score);
+            let p1Score = calculateDragonScore(p1Dice.Dragons[i]);
+            let p2Score = calculateDragonScore(p2Dice.Dragons[i]);
 
             if (p1Score > p2Score){
-                console.log("1");
                 points[0] ++;
-            }else if(p1Score < p2Score){
-                console.log("2");
+            }else if (p1Score < p2Score){
                 points[1] ++;
-            }else if (p1Score == p2Score){
-                console.log("3");
+            }else{
                 points[0] += 0.5;
                 points[1] += 0.5;
             }
         }
-    console.log(points);
         if (points[0] > points[1]){
             document.getElementById("victory--title").innerText = "PLAYER 1 WINS"
 
@@ -100,30 +114,62 @@ function populateOpponentDice(dice)
 
     parentContainer.classList.remove("leftAdjust");
     parentContainer.classList.remove("hidden");
-    requestAnimationFrame(() => { // wait just before the next paint
-        parentContainer.classList.add("rightAdjust");
-      });
+
     parentContainer.style = "opacity: 100%";
 
-    RollDice(undefined, "opp--");
+    let createDice = function(parent, text, type)
+    {
+        let newDice = document.createElement("div");
+        
+        parent.appendChild(newDice);
+        
+        newDice.setAttribute("id", type + "Die" + i);
+
+        newDice.classList.add("draggableDie");
+
+        let newText = document.createElement("p");
+        newText.innerText = text;
+
+        newDice.appendChild(newText);
+
+        if (type == "Buff"){
+            UpdateDragonBuffs(newDice, parent, i + 1, "opp--")
+        }
+    }
 
     for(var i = 0; i < 3; i++)
     {
-        let buffContainer = document.getElementById("opp--buff--container");
-        let dragonContainer =  document.getElementById("opp--dragon--container");
-    
-        console.log()
-
-        for(var i = 0; i < 3; i++){
-            let buffValue = dice.Buffs[i];
-            let dragonValue = dice.Dragons[i];
-           
-    
-            buffContainer.children[i].children[0].innerText = buffValue;
-            buffContainer.children[i].children[0].setAttribute("draggable", "false");
-            dragonContainer.children[i].children[0].innerText = dragonValue;
-            dragonContainer.children[i].children[0].setAttribute("draggable", "false");
+        if(dice.Dragons[i].Value == -1){
+            continue;
         }
+        let dragonContainer =  document.getElementById("opp--Dragonzone--" + (i + 1));
+        
+        var child = dragonContainer.lastElementChild; 
+        while (child) {
+            dragonContainer.removeChild(child);
+            child = dragonContainer.lastElementChild;
+        }
+
+        createDice(dragonContainer, dice.Dragons[i].Value, "Dragon");
+
+
+        for (var x = 1; x <= 3; x++){
+            let buff =  dice.Dragons[i]["Buff" + x];
+            if (buff == -1){
+                continue; 
+            }
+            let buffContainer = document.getElementById("opp--Buffzone--" + (i + 1) + "--" + x);
+            if(buffContainer.children.length > 0){
+                var child = buffContainer.lastElementChild; 
+                while (child) {
+                    buffContainer.removeChild(child);
+                    child = buffContainer.lastElementChild;
+                }
+            }
+
+            createDice(buffContainer, buff, "Buff");
+        }
+
     }
 }
 
@@ -131,38 +177,82 @@ function populatePlayerDice(dice)
 {
     let parentContainer = document.getElementById("clientside--container");
 
-    requestAnimationFrame(() => { // wait just before the next paint
-        parentContainer.classList.add("leftAdjust");
-      });
-    parentContainer.style = "opacity: 100%";
+    document.getElementById("rolldice--button").remove();
 
-    RollDice(document.getElementById("rolldice--button"));
     document.getElementById("confirm--dice--btn").remove();
+
+    let createDice = function(parent, text, type, draggable)
+    {
+        let newDice = document.createElement("div");
+        
+        parent.appendChild(newDice);
+        
+        newDice.setAttribute("id", type + "Die" + i);
+
+        newDice.classList.add("draggableDie");
+
+        let newText = document.createElement("p");
+        newText.innerText = text;
+
+        newDice.appendChild(newText);
+
+        if(draggable == true){
+            newDice.setAttribute("draggable", "true");
+
+            newDice.addEventListener("dragstart", event => {
+                previousDropZone = newDice.parentNode;
+                event.dataTransfer.setData("text/plain",  newDice.id);
+            });
+        }
+
+        if (type == "Buff"){
+            UpdateDragonBuffs(newDice, parent, i + 1)
+        }
+    }
 
     for(var i = 0; i < 3; i++)
     {
-        let buffContainer = document.getElementById("buff--container");
-        let dragonContainer =  document.getElementById("dragon--container");
-    
-        //console.log()
+        if(dice.Dragons[i].Value == -1){
+            continue;
+        }
+        let dragonContainer =  document.getElementById("Dragonzone--" + (i + 1));
+        
+        var child = dragonContainer.lastElementChild; 
+        while (child) {
+            dragonContainer.removeChild(child);
+            child = dragonContainer.lastElementChild;
+        }
 
-        for(var i = 0; i < 3; i++){
-            let buffValue = dice.Buffs[i];
-            let dragonValue = dice.Dragons[i];
-           
-    
-            buffContainer.children[i].children[0].innerText = buffValue;
-            buffContainer.children[i].children[0].setAttribute("draggable", "false");
-            dragonContainer.children[i].children[0].innerText = dragonValue;
-            dragonContainer.children[i].children[0].setAttribute("draggable", "false");
+        createDice(dragonContainer, dice.Dragons[i].Value, "Dragon", false);
+
+        for (var x = 1; x <= 3; x++){
+            let buff =  dice.Dragons[i]["Buff" + x];
+
+            if (buff == -1){
+                continue; 
+            }
+            let buffContainer = document.getElementById("Buffzone--" + (i + 1) + "--" + x);
+            if(buffContainer.children.length > 0){
+                var child = buffContainer.lastElementChild; 
+                while (child) {
+                    buffContainer.removeChild(child);
+                    child = buffContainer.lastElementChild;
+                }
+            }
+
+            createDice(buffContainer, buff, "Buff", true);
+
+            if (x == 3){
+            }
         }
     }
 }
 
 function checkGameStart(doc){
-    if(doc.data().player1Joined && doc.data().player2Joined){
+    if(doc.data().player1State >= 1 && doc.data().player2State >= 1){
         gameStarted = true;
         StartGame();
+        checkGameBehaviour(doc);
     }
 }
 
@@ -172,7 +262,7 @@ function StartGame(){
 }
 
 function checkGameRematch(doc){
-    if(doc.data().player1Rematch && doc.data().player2Rematch){
+    if(doc.data().player1State == 3 && doc.data().player2State == 3){
         RestartGame();
     }
 }
@@ -181,25 +271,51 @@ function RestartGame(){
     let date = new Date();
     let newGame = {
         timeCreated: date.getTime(),
-        player1Joined: true,
-        player2Joined: true,
-        player1Rematch: false,
-        player2Rematch: false,
+        player1State: 0, //0 = not joined, 1 = joined, 2 = ready, 3 = rematch
+        player2State: 0, //0 = not joined, 1 = joined, 2 = ready, 3 = rematch
         p1Dice: {
             Dragons: [
-
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                 {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 }
             ],
-            Buffs: [
-
-            ]
         },
         p2Dice: {
             Dragons: [
-
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                 {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 }
             ],
-            Buffs: [
-
-            ]
         },
         Points: [
 
@@ -214,16 +330,15 @@ function RestartGame(){
 }
 
 function StartOverGame(){
-    let playerField = "player" + playerNum + "Rematch";
+    let playerField = "player" + playerNum + "State";
     db.collection("games").doc(gameID).update({
-        [playerField]: true
+        [playerField]: 3
     });
 }
 
-var currentDraggingType = "";
 var previousDropZone;
 
-function RollDice(btn, prefix){
+function RollDice(btn){
 
     btn != undefined? btn.setAttribute("style", "visibility: hidden;"): "";
     
@@ -231,9 +346,9 @@ function RollDice(btn, prefix){
 
     for(var i = 0; i < 3; i++)
     {
-        let containerName = (prefix || "") + "dragon--container";
-        var e = document.querySelector("#" + containerName).children[i];
-        
+        let containerName = "Dragonzone--" + (i + 1);
+        var e = document.querySelector("#" + containerName);
+
         //e.firstElementChild can be used.
         var child = e.lastElementChild; 
         while (child) {
@@ -245,25 +360,16 @@ function RollDice(btn, prefix){
 
         let newDice = document.createElement("div");
         
-
-
-        document.getElementById(containerName).children[i].appendChild(newDice);
+        e.appendChild(newDice);
 
         newDice.setAttribute("id", "DragonDie" + i);
-        newDice.setAttribute("draggable", "true");
-        newDice.setAttribute("dragOnto", "Dragon");
+
         newDice.classList.add("draggableDie");
 
         let newText = document.createElement("p");
         newText.innerText = randInt;
 
         newDice.appendChild(newText);
-
-        newDice.addEventListener("dragstart", e => {
-            previousDropZone = newDice.parentNode;
-            currentDraggingType = "Dragon";
-            e.dataTransfer.setData("text/plain",  newDice.id);
-        });
     }
 
     for(var i = 0; i < 3; i++)
@@ -272,8 +378,8 @@ function RollDice(btn, prefix){
 
         let newDice = document.createElement("div");
         
-        let containerName = (prefix || "") + "buff--container";
-        var e = document.querySelector("#" + containerName).children[i];
+        let containerName = "Buffzone--" + (i + 1) + "--1";
+        var e = document.querySelector("#" + containerName);
         
         //e.firstElementChild can be used.
         var child = e.lastElementChild; 
@@ -282,7 +388,7 @@ function RollDice(btn, prefix){
             child = e.lastElementChild;
         }
 
-        document.getElementById(containerName).children[i].appendChild(newDice);
+        e.appendChild(newDice);
 
         newDice.setAttribute("id", "BuffDie" + i);
         newDice.setAttribute("draggable", "true");
@@ -293,13 +399,53 @@ function RollDice(btn, prefix){
         newText.innerText = randInt;
 
         newDice.appendChild(newText);
+        
+        UpdateDragonBuffs(newDice, e, i+1);
 
-        newDice.addEventListener("dragstart", e => {
+        newDice.addEventListener("dragstart", event => {
             previousDropZone = newDice.parentNode;
-            currentDraggingType = "Buff";
-            e.dataTransfer.setData("text/plain",  newDice.id);
+            event.dataTransfer.setData("text/plain",  newDice.id);
+
         });
     }
+}
+
+function UpdateDragonBuffs(droppedElement, dropZone, index, prefix){
+    
+    let dropVal = parseInt(droppedElement.children[0].innerText);
+    let dragonVal = parseInt(document.getElementById((prefix || "") + "Dragonzone--" + index).children[0].innerText);
+
+    console.log(dropVal, dropVal % 2)
+    console.log(dragonVal, dragonVal % 2)
+
+    if ( dropVal % 2 == dragonVal % 2){
+        dropZone.style.borderColor = "#297336";
+    }else{
+        dropZone.style.borderColor = "#31cfde";
+    }
+
+
+    let tempDragon = {
+        Value: -1,
+        Buff1: -1,
+        Buff2: -1,
+        Buff3: -1
+    }
+
+    console.log(index);
+
+    tempDragon.Value = dragonVal;
+
+    for(var x = 1; x <= 3; x++){
+        let buffZone = document.getElementById((prefix || "") + "Buffzone--" + index + "--" + x);
+
+        if (buffZone.children.length > 0){
+            tempDragon["Buff" + x] = parseInt(buffZone.children[0].innerText);
+        }
+    }
+
+    let textElement = document.getElementById((prefix || "") + "Dragonvalue--" + index);
+    textElement.innerText = calculateDragonScore(tempDragon);
 }
 
 function getRandomInt(min, max) {
@@ -314,40 +460,54 @@ function ConfirmDice(btn)
 
     let dieValues = {
         Dragons: [
-
+            {
+                Value: -1,
+                Buff1: -1,
+                Buff2: -1,
+                Buff3: -1,
+             },
+            {
+                Value: -1,
+                Buff1: -1,
+                Buff2: -1,
+                Buff3: -1,
+             },
+             {
+                Value: -1,
+                Buff1: -1,
+                Buff2: -1,
+                Buff3: -1,
+             }
         ],
-        Buffs: [
-
-        ]
     };
 
-    let buffContainer = document.getElementById("buff--container");
-    let dragonContainer = document.getElementById("dragon--container");
+    for(var i = 1; i <= 3; i++){
+        let dragonZone = document.getElementById("Dragonzone--" + i);
 
-    for(var i = 0; i < 3; i++){
-        let buffValue = buffContainer.children[i].children[0].innerText;
-        let dragonValue = dragonContainer.children[i].children[0].innerText;
+        dieValues.Dragons[i - 1].Value = parseInt(dragonZone.children[0].innerText);
 
-        let multiplier = (buffValue % 2 != dragonValue % 2)? 1: gameConfig.SimilarityMultiplier; 
+        for (var x = 1; x <= 3; x++){
+            let buffZone = document.getElementById("Buffzone--" + i + "--" + x);
 
-        dieValues.Dragons[i] = parseInt(dragonValue);
-        dieValues.Buffs[i] = parseInt(buffValue);
+            if(buffZone.children.length > 0){
+                dieValues.Dragons[i - 1]["Buff" + x] = (parseInt(buffZone.children[0].innerText))
+            }
+        }
     }
 
     let playerDieField = "p" + playerNum + "Dice";
+    let playerStateField = "player" + playerNum + "State";
 
     db.collection("games").doc(gameID).update({
-        [playerDieField]: dieValues
+        [playerDieField]: dieValues,
+        [playerStateField]: 2
     });
 }
 
 for (const dropZone of document.querySelectorAll(".drop-zone")){
     dropZone.addEventListener("dragover", e => {
         e.preventDefault();
-
-        if(currentDraggingType == dropZone.getAttribute("dragValue")){
-            dropZone.classList.add("drop-zone--over");
-        }
+        dropZone.classList.add("drop-zone--over");
 
     })
 
@@ -361,17 +521,22 @@ for (const dropZone of document.querySelectorAll(".drop-zone")){
         const droppedElementId = e.dataTransfer.getData("text/plain");
         const droppedElement = document.getElementById(droppedElementId);
 
-        if(droppedElement.getAttribute("dragOnto") == dropZone.getAttribute("dragValue")){
-
-            if(dropZone.children.length > 0){
-                previousDropZone.appendChild(dropZone.children[0]);
-                //dropZone.children[0].delete();
-            }
-
-            dropZone.appendChild(droppedElement);
-
-            dropZone.classList.remove("drop-zone--over");
+       
+        if(dropZone.children.length > 0){
+            previousDropZone.appendChild(dropZone.children[0]);
+            //dropZone.children[0].delete();
         }
+
+        previousDropZone.style.borderColor = "#31cfde";
+
+        dropZone.appendChild(droppedElement);
+
+        dropZone.classList.remove("drop-zone--over");
+
+        let index = dropZone.getAttribute("dragIndex");
+
+        UpdateDragonBuffs(droppedElement, dropZone, index);
+        
 
     })
 }

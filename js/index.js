@@ -3,25 +3,51 @@ function CreatePrivateGame()
     let date = new Date();
     let newGame = {
         timeCreated: date.getTime(),
-        player1Joined: false,
-        player2Joined: false,
-        player1Rematch: false,
-        player2Rematch: false,
+        player1State: 0, //0 = not joined, 1 = joined, 2 = ready, 3 = rematch
+        player2State: 0, //0 = not joined, 1 = joined, 2 = ready, 3 = rematch
         p1Dice: {
             Dragons: [
-
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                 {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 }
             ],
-            Buffs: [
-
-            ]
         },
         p2Dice: {
             Dragons: [
-
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                 {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 }
             ],
-            Buffs: [
-
-            ]
         },
         Points: [
 
