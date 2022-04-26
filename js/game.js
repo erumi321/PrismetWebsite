@@ -169,6 +169,7 @@ function populateOpponentDice(dice)
 
             createDice(buffContainer, buff, "Buff");
         }
+        UpdateDragonBuffs(null, null, i + 1, "opp--", true)
 
     }
 }
@@ -177,9 +178,12 @@ function populatePlayerDice(dice)
 {
     let parentContainer = document.getElementById("clientside--container");
 
-    document.getElementById("rolldice--button").remove();
-
-    document.getElementById("confirm--dice--btn").remove();
+    if (document.contains(document.getElementById("rolldice--button"))) {
+        document.getElementById("rolldice--button").remove();
+    } 
+    if (document.contains(document.getElementById("confirm--dice--btn"))) {
+        document.getElementById("confirm--dice--btn").remove();
+    }   
 
     let createDice = function(parent, text, type, draggable)
     {
@@ -242,9 +246,8 @@ function populatePlayerDice(dice)
 
             createDice(buffContainer, buff, "Buff", true);
 
-            if (x == 3){
-            }
         }
+    UpdateDragonBuffs(null, null, i + 1, null, true)
     }
 }
 
@@ -410,17 +413,20 @@ function RollDice(btn){
     }
 }
 
-function UpdateDragonBuffs(droppedElement, dropZone, index, prefix){
+function UpdateDragonBuffs(droppedElement, dropZone, index, prefix, textOnly){
     
     let dragonVal = parseInt(document.getElementById((prefix || "") + "Dragonzone--" + index).children[0].innerText);
 
     let dropVal = droppedElement != null? parseInt(droppedElement.children[0].innerText): -1;
 
-    if (dropVal != -1 && dropVal % 2 == dragonVal % 2){
-        dropZone.style.borderColor = "#297336";
-    }else{
-        dropZone.style.borderColor = "#31cfde";
+    if(textOnly != true){
+        if (dropVal != -1 && dropVal % 2 == dragonVal % 2){
+            dropZone.style.borderColor = "#297336";
+        }else{
+            dropZone.style.borderColor = "#31cfde";
+        }
     }
+
 
 
     let tempDragon = {
@@ -442,7 +448,9 @@ function UpdateDragonBuffs(droppedElement, dropZone, index, prefix){
 
     let textElement = document.getElementById((prefix || "") + "Dragonvalue--" + index);
     
-    textElement.innerText = calculateDragonScore(tempDragon);
+    let text = calculateDragonScore(tempDragon);
+
+    textElement.innerText = text;
 }
 
 function getRandomInt(min, max) {
@@ -526,11 +534,9 @@ for (const dropZone of document.querySelectorAll(".drop-zone")){
 
         previousDropZone.style.borderColor = "#31cfde";
 
-        console.log(previousDropZone.getAttribute("dragIndex"));
-
         dropZone.appendChild(droppedElement);
-
         dropZone.classList.remove("drop-zone--over");
+        
         UpdateDragonBuffs(null, previousDropZone, previousDropZone.getAttribute("dragIndex"));
 
         let index = dropZone.getAttribute("dragIndex");
