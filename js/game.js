@@ -412,13 +412,11 @@ function RollDice(btn){
 
 function UpdateDragonBuffs(droppedElement, dropZone, index, prefix){
     
-    let dropVal = parseInt(droppedElement.children[0].innerText);
     let dragonVal = parseInt(document.getElementById((prefix || "") + "Dragonzone--" + index).children[0].innerText);
 
-    console.log(dropVal, dropVal % 2)
-    console.log(dragonVal, dragonVal % 2)
+    let dropVal = droppedElement != null? parseInt(droppedElement.children[0].innerText): -1;
 
-    if ( dropVal % 2 == dragonVal % 2){
+    if (dropVal != -1 && dropVal % 2 == dragonVal % 2){
         dropZone.style.borderColor = "#297336";
     }else{
         dropZone.style.borderColor = "#31cfde";
@@ -432,8 +430,6 @@ function UpdateDragonBuffs(droppedElement, dropZone, index, prefix){
         Buff3: -1
     }
 
-    console.log(index);
-
     tempDragon.Value = dragonVal;
 
     for(var x = 1; x <= 3; x++){
@@ -445,6 +441,7 @@ function UpdateDragonBuffs(droppedElement, dropZone, index, prefix){
     }
 
     let textElement = document.getElementById((prefix || "") + "Dragonvalue--" + index);
+    
     textElement.innerText = calculateDragonScore(tempDragon);
 }
 
@@ -529,9 +526,12 @@ for (const dropZone of document.querySelectorAll(".drop-zone")){
 
         previousDropZone.style.borderColor = "#31cfde";
 
+        console.log(previousDropZone.getAttribute("dragIndex"));
+
         dropZone.appendChild(droppedElement);
 
         dropZone.classList.remove("drop-zone--over");
+        UpdateDragonBuffs(null, previousDropZone, previousDropZone.getAttribute("dragIndex"));
 
         let index = dropZone.getAttribute("dragIndex");
 
