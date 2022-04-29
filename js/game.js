@@ -2,17 +2,51 @@ var gameID = "";
 var playerNum = -1;
 
 var gameStarted = false;
+var currentPlayerState = 100;
+
+function copyLink(){
+    /* Get the text field */
+    var copyText = document.getElementById("invite--link");
+
+    /* Copy the text inside the text field */
+    navigator.clipboard.writeText(copyText.innerText);
+
+
+    document.getElementById("waiting--copy--icon").classList.add("hidden");
+    document.getElementById("waiting--checkmark--icon").classList.remove("hidden");
+
+    let copyBtn = document.getElementById("invite--copy--btn");
+    copyBtn.setAttribute("style", "cursor: deafult");
+    copyBtn.setAttribute("onclick", "");
+
+    setTimeout(()=>{
+        document.getElementById("waiting--copy--icon").classList.remove("hidden");
+        document.getElementById("waiting--checkmark--icon").classList.add("hidden");
+        copyBtn.setAttribute("style", "cursor: pointer");
+
+        copyBtn.setAttribute("onclick", "copyLink()");
+    }, 2000)
+}
+
+function ReturnToHome() {
+    // delete game
+
+    location.href = "index.html";
+}
 
 function GetGameID()
 {
+    document.documentElement.style.setProperty('--wing-color', gameConfig.WingColor);
+    document.documentElement.style.setProperty('--tail-color', gameConfig.TailColor);
+    document.documentElement.style.setProperty('--body-color', gameConfig.BodyColor);
+    document.documentElement.style.setProperty('--similar-color', gameConfig.SimilarColor);
+
     gameID = window.location.hash.split("~")[0].slice(1);
     playerNum = window.location.hash.split("~")[1];
 
     newPlayerLink =  window.location.href.split("~")[0] + "~2";
 
-    document.getElementById("Title").innerHTML = "You are player: " + playerNum + "<br>Send this link to your friend: <a href='" + newPlayerLink + "'>" + newPlayerLink + "</a>";
-
-
+    document.getElementById("invite--link").innerHTML = newPlayerLink.substring();
 
     db.collection("games").doc(gameID)
     .onSnapshot((doc) => {
@@ -29,12 +63,14 @@ function onSnapshot(doc) {
     console.log("Current data: ", doc.data());
    
     let playerField = "player" + playerNum + "State";
+    var currentPlayerState = doc.data()[playerField];
 
     if (doc.data()[playerField] == 0){
 
         db.collection("games").doc(gameID).update({
             [playerField]: 1
         });
+        currentPlayerState = 1;
     }
 
     checkGameRematch(doc);
@@ -64,20 +100,23 @@ function calculateDragonScore(dragon){
 }
 
 function checkGameBehaviour(doc){
+
     let p1Dice = doc.data().p1Dice;
     let p2Dice = doc.data().p2Dice;
 
     let playerStateField = "player" + playerNum + "State";
-    if (doc.data()[playerStateField] == 2){
-        populatePlayerDice(playerNum == 1? p1Dice: p2Dice);
+    currentPlayerState = doc.data()[playerStateField];
+    if (doc.data()[playerStateField] >= 1.5){
+        console.log("DELETE", doc.data()[playerStateField], doc.data()[playerStateField] >= 2)
+        populatePlayerDice(playerNum == 1? p1Dice: p2Dice, doc.data()[playerStateField] >= 2? true:false);
     }
 
     let oppStateField = "player" + (playerNum == 1? 2: 1) + "State";
-    if (doc.data()[oppStateField] == 2 && doc.data()[playerStateField] == 2){
+    if (doc.data()[oppStateField] >= 2 && doc.data()[playerStateField] >= 2){
         populateOpponentDice(playerNum == 1? p2Dice: p1Dice);
     }
 
-    if (doc.data().player1State == 2 && doc.data().player2State == 2){
+    if (doc.data().player1State >= 2 && doc.data().player2State >= 2){
         let points = [0, 0];
         
 
@@ -96,26 +135,45 @@ function checkGameBehaviour(doc){
             }
         }
         if (points[0] > points[1]){
-            document.getElementById("victory--title").innerText = "PLAYER 1 WINS"
+            document.getElementById("victory--title").innerText = "YOU " + (playerNum == 1? "WIN" : "LOSE")
 
         }else if(points[0] < points[1]){
-            document.getElementById("victory--title").innerText = "PLAYER 2 WINS"
+            document.getElementById("victory--title").innerText = "YOU " + (playerNum == 2? "WIN" : "LOSE")
 
         }else if (points[0] == points[1]){
-            document.getElementById("victory--title").innerText = "TIE"
+            document.getElementById("victory--title").innerText = "YOU TIE"
         }
-        document.getElementById("victory--container").classList.remove("hidden");
+
+    }
+
+    if (doc.data()[playerStateField] == 3) {
+        console.log("start over");
+        StartOverGame(document.getElementById("go--again"), false);
     }
 }
 
 function populateOpponentDice(dice)
 {
     let parentContainer = document.getElementById("opponentside--container");
+    let victoryContainer = document.getElementById("victory--container");
 
-    parentContainer.classList.remove("leftAdjust");
     parentContainer.classList.remove("hidden");
+    victoryContainer.classList.remove("hidden");
+    parentContainer.style.top = "-30vh";
+    if (victoryContainer.getAttribute("doFade") == "true"){
+        victoryContainer.style.opacity = "0%";
+    }
+    
+    requestAnimationFrame(() => { // wait just before the next paint
+        if (victoryContainer.getAttribute("doFade") == "true"){
+            victoryContainer.setAttribute("doFade", "false")
+            setTimeout(() => {
+                victoryContainer.style.opacity = "";
+            }, 1000);
+        }
 
-    parentContainer.style = "opacity: 100%";
+        parentContainer.style.top = "";
+    });
 
     let createDice = function(parent, text, type)
     {
@@ -125,7 +183,6 @@ function populateOpponentDice(dice)
         
         newDice.setAttribute("id", type + "Die" + i);
 
-        newDice.classList.add("draggableDie");
 
         let newText = document.createElement("p");
         newText.innerText = text;
@@ -133,7 +190,10 @@ function populateOpponentDice(dice)
         newDice.appendChild(newText);
 
         if (type == "Buff"){
-            UpdateDragonBuffs(newDice, parent, i + 1, "opp--")
+            newDice.classList.add("draggableDie");
+            UpdateDragonBuffs(i + 1, "opp--")
+        }else{
+            newDice.classList.add("dragonDie");
         }
     }
 
@@ -169,12 +229,12 @@ function populateOpponentDice(dice)
 
             createDice(buffContainer, buff, "Buff");
         }
-        UpdateDragonBuffs(null, null, i + 1, "opp--", true)
+        UpdateDragonBuffs(i + 1, "opp--", true)
 
     }
 }
 
-function populatePlayerDice(dice)
+function populatePlayerDice(dice, doConfirmDelete)
 {
     let parentContainer = document.getElementById("clientside--container");
 
@@ -182,8 +242,12 @@ function populatePlayerDice(dice)
         document.getElementById("rolldice--button").remove();
     } 
     if (document.contains(document.getElementById("confirm--dice--btn"))) {
-        document.getElementById("confirm--dice--btn").remove();
-    }   
+        if (doConfirmDelete){
+            document.getElementById("confirm--dice--btn").remove();
+        }else{
+            document.getElementById("confirm--dice--btn").classList.remove("confirm--dice--btn--hidden");
+        }
+    }
 
     let createDice = function(parent, text, type, draggable)
     {
@@ -193,24 +257,32 @@ function populatePlayerDice(dice)
         
         newDice.setAttribute("id", type + "Die" + i);
 
-        newDice.classList.add("draggableDie");
 
         let newText = document.createElement("p");
         newText.innerText = text;
 
         newDice.appendChild(newText);
 
+        console.log(draggable);
+
         if(draggable == true){
-            newDice.setAttribute("draggable", "true");
+            console.log(text, type, "testing", currentPlayerState, currentPlayerState <= 1.5);
+            newDice.classList.add("draggableDie");
+            newDice.setAttribute("draggable", currentPlayerState <= 1.5? "true": "false");
 
             newDice.addEventListener("dragstart", event => {
-                previousDropZone = newDice.parentNode;
+                console.log("start");
+                newDice.setAttribute("previousparentid", newDice.parentNode.id);
                 event.dataTransfer.setData("text/plain",  newDice.id);
+                console.log(event.dataTransfer.getData("text/plain"))
+                
             });
+        }else{
+            newDice.classList.add("dragonDie");
         }
 
         if (type == "Buff"){
-            UpdateDragonBuffs(newDice, parent, i + 1)
+            UpdateDragonBuffs(i + 1)
         }
     }
 
@@ -247,7 +319,7 @@ function populatePlayerDice(dice)
             createDice(buffContainer, buff, "Buff", true);
 
         }
-    UpdateDragonBuffs(null, null, i + 1, null, true)
+    UpdateDragonBuffs(i + 1, null, true)
     }
 }
 
@@ -274,8 +346,8 @@ function RestartGame(){
     let date = new Date();
     let newGame = {
         timeCreated: date.getTime(),
-        player1State: 0, //0 = not joined, 1 = joined, 2 = ready, 3 = rematch
-        player2State: 0, //0 = not joined, 1 = joined, 2 = ready, 3 = rematch
+        player1State: 1, //0 = not joined, 1 = joined, 2 = ready, 3 = rematch
+        player2State: 1, //0 = not joined, 1 = joined, 2 = ready, 3 = rematch
         p1Dice: {
             Dragons: [
                 {
@@ -324,28 +396,58 @@ function RestartGame(){
 
         ]
     };
+    console.log("yo");
     db.collection("games").doc(gameID).set(newGame)
     .then(() =>{
         location.reload();
 
+
     });
 
 }
 
-function StartOverGame(){
-    let playerField = "player" + playerNum + "State";
-    db.collection("games").doc(gameID).update({
-        [playerField]: 3
-    });
+function StartOverGame(btn, updateState){
+    btn.querySelector("#victory--btnText").innerHTML = "Waiting";
+     btn.classList.add("victory--button--active");
+
+    if (updateState){
+        let playerField = "player" + playerNum + "State";
+        db.collection("games").doc(gameID).update({
+            [playerField]: 3
+        });
+        currentPlayerState = 3;
+    }
 }
 
-var previousDropZone;
 
 function RollDice(btn){
 
+    let dieValues = {
+        Dragons: [
+            {
+                Value: -1,
+                Buff1: -1,
+                Buff2: -1,
+                Buff3: -1,
+             },
+            {
+                Value: -1,
+                Buff1: -1,
+                Buff2: -1,
+                Buff3: -1,
+             },
+             {
+                Value: -1,
+                Buff1: -1,
+                Buff2: -1,
+                Buff3: -1,
+             }
+        ],
+    }
+
     btn != undefined? btn.setAttribute("style", "visibility: hidden;"): "";
     
-    document.getElementById("confirm--dice--btn").classList.remove("hidden");
+    document.getElementById("confirm--dice--btn").classList.remove("confirm--dice--btn--hidden");
 
     for(var i = 0; i < 3; i++)
     {
@@ -367,21 +469,24 @@ function RollDice(btn){
 
         newDice.setAttribute("id", "DragonDie" + i);
 
-        newDice.classList.add("draggableDie");
+        newDice.classList.add("dragonDie");
 
         let newText = document.createElement("p");
         newText.innerText = randInt;
 
+        dieValues.Dragons[i].Value = randInt
+
         newDice.appendChild(newText);
     }
 
-    for(var i = 0; i < 3; i++)
+    for(var x = 1; x <= 3; x++)
     {
+        console.log(x)
         let randInt = getRandomInt(gameConfig.BuffMinAmount, gameConfig.BuffMaxAmount)
 
         let newDice = document.createElement("div");
         
-        let containerName = "Buffzone--" + (i + 1) + "--1";
+        let containerName = "Buffzone--" + x + "--1";
         var e = document.querySelector("#" + containerName);
         
         //e.firstElementChild can be used.
@@ -393,41 +498,41 @@ function RollDice(btn){
 
         e.appendChild(newDice);
 
-        newDice.setAttribute("id", "BuffDie" + i);
+        newDice.setAttribute("id", "BuffDie" + x);
         newDice.setAttribute("draggable", "true");
         newDice.setAttribute("dragOnto", "Buff");
         newDice.classList.add("draggableDie");
 
         let newText = document.createElement("p");
         newText.innerText = randInt;
+        
+        dieValues.Dragons[x - 1].Buff1 = randInt
 
         newDice.appendChild(newText);
         
-        UpdateDragonBuffs(newDice, e, i+1);
+        UpdateDragonBuffs(x);
 
         newDice.addEventListener("dragstart", event => {
-            previousDropZone = newDice.parentNode;
+            console.log("start");
+            newDice.setAttribute("previousparentid", newDice.parentNode.id);
             event.dataTransfer.setData("text/plain",  newDice.id);
-
+            console.log(event.dataTransfer.getData("text/plain"))
+            console.log(x)
         });
     }
+
+    let playerStateField = "player" + playerNum + "State";
+    let playerDieField = "p" + playerNum + "Dice";
+    currentPlayerState = 1.5;
+
+    db.collection("games").doc(gameID).update({
+        [playerDieField]: dieValues,
+        [playerStateField]: 1.5
+    });
 }
 
-function UpdateDragonBuffs(droppedElement, dropZone, index, prefix, textOnly){
-    
+function UpdateDragonBuffs(index, prefix, textOnly){
     let dragonVal = parseInt(document.getElementById((prefix || "") + "Dragonzone--" + index).children[0].innerText);
-
-    let dropVal = droppedElement != null? parseInt(droppedElement.children[0].innerText): -1;
-
-    if(textOnly != true){
-        if (dropVal != -1 && dropVal % 2 == dragonVal % 2){
-            dropZone.style.borderColor = "#297336";
-        }else{
-            dropZone.style.borderColor = "#31cfde";
-        }
-    }
-
-
 
     let tempDragon = {
         Value: -1,
@@ -440,6 +545,14 @@ function UpdateDragonBuffs(droppedElement, dropZone, index, prefix, textOnly){
 
     for(var x = 1; x <= 3; x++){
         let buffZone = document.getElementById((prefix || "") + "Buffzone--" + index + "--" + x);
+
+        if(textOnly != true){
+            if (buffZone.children.length > 0 && buffZone.children[0].innerText % 2 == dragonVal % 2){
+                buffZone.classList.add("similar-color");
+            }else{
+                buffZone.classList.remove("similar-color");
+            }
+        }
 
         if (buffZone.children.length > 0){
             tempDragon["Buff" + x] = parseInt(buffZone.children[0].innerText);
@@ -461,6 +574,11 @@ function getRandomInt(min, max) {
 
 function ConfirmDice(btn)
 {
+    let dies = document.getElementsByClassName("draggableDie")
+    for (var die of dies){
+        die.setAttribute("draggable", false);
+    }
+
     btn.setAttribute("style", "visibility: hidden;");
 
     let dieValues = {
@@ -502,6 +620,7 @@ function ConfirmDice(btn)
 
     let playerDieField = "p" + playerNum + "Dice";
     let playerStateField = "player" + playerNum + "State";
+    currentPlayerState = 2;
 
     db.collection("games").doc(gameID).update({
         [playerDieField]: dieValues,
@@ -526,22 +645,22 @@ for (const dropZone of document.querySelectorAll(".drop-zone")){
         const droppedElementId = e.dataTransfer.getData("text/plain");
         const droppedElement = document.getElementById(droppedElementId);
 
+        console.log("dropped", droppedElementId, droppedElement);
+
+        let previousDropZone = document.getElementById(droppedElement.getAttribute("previousparentid"));
        
         if(dropZone.children.length > 0){
             previousDropZone.appendChild(dropZone.children[0]);
-            //dropZone.children[0].delete();
         }
-
-        previousDropZone.style.borderColor = "#31cfde";
 
         dropZone.appendChild(droppedElement);
         dropZone.classList.remove("drop-zone--over");
         
-        UpdateDragonBuffs(null, previousDropZone, previousDropZone.getAttribute("dragIndex"));
+        UpdateDragonBuffs(previousDropZone.getAttribute("dragIndex"));
 
         let index = dropZone.getAttribute("dragIndex");
 
-        UpdateDragonBuffs(droppedElement, dropZone, index);
+        UpdateDragonBuffs(index);
         
 
     })

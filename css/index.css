@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
+
+body {
+    background-color: #ccc;
+}
+
+
+/* Rules */
+
+.hero--container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, -75%);
+    margin: 0;
+    width: 75vw;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 1.5%;
+}
+
+.hero--title {
+    font-size: 8em;
+    text-align: center;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    color: rgb(255,114,114);
+    color: linear-gradient(29deg, rgba(255,114,114,0.1) 0%, rgba(223,81,81,0.75) 25%, rgba(167,23,23,0.45) 50%, rgba(115,115,115,0.75) 75%, rgba(172,172,172,0.1) 100%);
+    -webkit-text-stroke: 3px black; /* width and color */
+}
+
+.hero--createprivate {
+    display: block;
+    margin: 0 auto;
+    width: 8vw;
+    height: 4vw;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1.3em;
+    background-color: #444;
+    cursor: pointer;
+    color: #cc0000;
+    transition: background-color 0.2s ease-in, color 0.2s ease-out;
+}
+
+.hero--createprivate:hover {
+    background-color: #666;
+    color: #dd0000;
+    transition: background-color 0.2s ease-out, color 0.2s ease-out;
+}
+/* Rules */
+
+.rules--container {
+    height: max-content;
+    width: 100%;
+    position: absolute;
+    top: 65vh;
+    margin: 0;
+    left: 0;
+
+}
+
+.rules--text {
+    margin: 0 4vw;
+    font-size: 1.15em;
+    font-family: 'Source Code Pro', monospace;
+}

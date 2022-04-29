@@ -1,63 +1,132 @@
-* {
-    -webkit-touch-callout: none; /* iOS Safari */
-        -webkit-user-select: none; /* Safari */
-        -khtml-user-select: none; /* Konqueror HTML */
-            -moz-user-select: none; /* Old versions of Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-                user-select: none; /* Non-prefixed version, currently
-                                    supported by Chrome, Edge, Opera and Firefox */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Source+Code+Pro&display=swap');
+
+:root {
+    --wing-color: #000000;
+    --tail-color: #000000;
+    --body-color: #000000;
+    --similar-color: #000000;
 }
 
-.rollButton
-{
-    display: inline-block;
+
+
+body {
+    background-color: #ccc;
 }
 
-.button--column {
-    display: inline-block
-}
-
-.container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-  }
-
-.drop-zone--over { 
-    opacity: 0.5
-}
-
-.draggableDie {
-    position: absolute;
-    width: 1.5vw;
-    height: 1.5vw;
-    border: 0.18vw dashed black;
+/* Waiting */
+.waiting--container{
     text-align: center;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5em;
-}
-
-.draggableDie p {
+    position: absolute;
+    top: calc(50% - 12.5vh);
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%);
     margin: 0;
+    background: #777;
+    width: max-content;
+    height: 25vh;
+    border-radius: 1.5%;
+    color: #d6d6d6;
 }
 
-.Buffzone--container {
-    display: block;
-    margin-left: -130px;
+#waiting--title {
+    font-family: 'Source Code Pro', monospace;
+
 }
 
-.buffzone {
-    width: 3vw;
-    height: 3vw;
-    margin-right: 0.3vw;
-    margin-top: 0.3vw;
-    
-    display: inline-flex;
-    align-items: center;
+.invite--container {
+    background-color: #999;
+    width: max-content;
+    margin: 0 auto;
+    padding: 6px 0;
+    margin: 0 10px;
+    border-radius: 6px;
+    height: 40px;
+    position: relative;
+    display: flex;
     justify-content: center;
-    border: 0.48vw dashed black;
+    align-content: center;
+    flex-direction: column;
+}
 
+.invite--link {
+    padding: 20px 60px;
+    margin: 0 auto;
+    font-family: 'Source Code Pro', monospace;
+    -webkit-touch-callout: initial; /* iOS Safari */
+    -webkit-user-select:text; /* Safari */
+        -moz-user-select:text; /* Old versions of Firefox */
+        -ms-user-select:text; /* Internet Explorer/Edge */
+            user-select:text; /* Non-prefixed version, currently
+                                supported by Chrome, Edge, Opera and Firefox */
+}
+
+.invite--return {
+    display: block;
+    position: absolute;
+    bottom: 0px;
+
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, -25%);
+
+    width: 8vw;
+    height: 2vw;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1.3em;
+    background-color: #555;
+    cursor: pointer;
+    color: inherit;
+    transition: background-color 0.2s ease-in, color 0.2s ease-out;
+}
+
+.invite--copy {
+    position: absolute;
+    width: max-content;
+    border-radius: 10px;
+    background-color: #ddd;
+    right: 10px;
+}
+
+/* game container */
+.game--container {
+    margin-top: 5vh;
+}
+
+.game--title {
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+    padding: 0;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Table  graphics */
+.table--container {
+    z-index: -1;
+    position: absolute;
+    background: url("https://external-preview.redd.it/BU1XBFqOHhO28CHdz2bofpGsPEQObf42kUjqaX7Eh10.jpg?auto=webp&s=6c4990b338bb00d678652ee7a6d9db1a5c6ca656");
+    border: 2vw #53361c solid;
+    border-image: url("https://media.istockphoto.com/photos/laminate-wooden-floor-texture-background-picture-id1083302826?b=1&k=20&m=1083302826&s=170667a&w=0&h=ePdma8I7u7KHs2YbehQSVcCX9qay5iPr3wynsWnzFZ0=") 15 round;
+    background-size: contain;
+    width: 70vw;
+    height: 35vw;
+    left: 11.5vw;
+    top: 12vh;
+}
+
+/* Dice containers */
+.interact--container {
+    overflow:visible;
+
+    align-content: center;
+    justify-content: center;
+    justify-items: center;
+}
+
+.set--container {
+    margin-left: 35px;
+    display: inline-block;
 }
 
 .dragonzone {
@@ -72,64 +141,248 @@
     border: 0.48vw dashed black;
 }
 
-.interact--container {
-    overflow:visible;
 
-    align-content: center;
+.buffzone {
+    width: 3vw;
+    height: 3vw;
+    margin-right: 0.3vw;
+    margin-top: 0.3vw;
+    
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    justify-items: center;
+    border: 0.48vw dashed black;
+
 }
 
-.set--container {
-    margin-left: 35px;
-    display: inline-block;
+.wing {
+    border-color: var(--wing-color);
 }
 
-#confirm--dice--btn{
-    display: inline-block;
+.tail {
+    border-color: var(--tail-color);
+}
+.body {
+    border-color: var(--body-color);
+}
+
+.similar-color {
+    border-color: var(--similar-color);
+}
+
+.Buffzone--container {
+    display: block;
+    margin-left: -130px;
+}
+
+.drop-zone--over { 
+    opacity: 0.5
+}
+
+/* Dice */
+
+.draggableDie {
     position: absolute;
-    top: 119px;
-    width: 100px;
-    margin-left: 10px;
+    width: 1.5vw;
+    height: 1.5vw;
+    border: 0.18vw dashed #aaa;
+    background: #aaa;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
 }
 
+.draggableDie p {
+    margin: 0;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.dragonDie {
+    position: absolute;
+    width: 1.5vw;
+    height: 1.5vw;
+    border: 0.18vw dashed #aaa;
+    background: #aaa;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+}
+
+.dragonDie p {
+    margin: 0;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Client side */
 #clientside--container {
     position: absolute;
     float: left;
-    left: 22.727864583vw;
-    top: 50vh;
-    transition: left 1.5s ease-in-out;
-}
-#opponentside--container {
-    position: absolute;
-    left: 22.727864583vw;
-    top: 15vh;
-    transition: opacity 1.5s ease-in-out;
-    opacity: 100;
+    left: 25.727864583vw;
+    top: 60vh;
 }
 
+
+#opponentside--container {
+    position: absolute;
+    left: 25.727864583vw;
+    top: 20vh;
+    transition: top 1.5s ease-in-out;
+}
+.opponentside--label {
+    position: relative;
+    display: inline-block;
+    margin-right: -7.25vw;
+    left: -8vw;
+    top: -9vh;
+    font-family: 'Share Tech Mono', monospace;
+    color: #aaa;
+}
+
+.clientside--label {
+    position: relative;
+    display: inline-block;
+    margin-right: -3vw;
+    left: -8vw;
+    top: -3vh;
+    font-family: 'Share Tech Mono', monospace;
+    color: #aaa;
+}
+
+/* Buttons */
 .rolldice--button {
     display: inline-block;
     position: absolute;
-    top: 119px;
-    left: -69.34px;
+    top: -11.0185185185vh;
+    left: 12vw;
+    background-color: #810000;
+    color: #ccc;
+    border-color: #ccc;
+    width: 6vw;
+    height: 3vw;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.3em;
 }
 
-.victory--container {
-    position: fixed;
-    top: calc(50% - 8.05555555556vh);
-    left: 33vw;
-    width: 100vw;
-    text-align: center;
+.confirm--dice--btn{
+    display: inline-block;
+    position: absolute;
+    top: -11.0185185185vh;
+    left: 28vw;
+    background-color: var(--similar-color);
+    color: #ccc;
+    border-color: #ccc;
+    width: 6vw;
+    height: 3vw;
+    transition: opacity 0.1s linear;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.3em;
 }
 
-.victory--title {
-    flex: left;
-    margin: 0 auto 0 auto;
+.confirm--dice--btn--hidden {
+    opacity: 0;
 }
 
 .Dragonvalue {
     text-align: center;
     font-size: 1.75em;
     margin-left: -0.5vw;
+    color: #aaa;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+
+/* Victory text */
+.victory--container {
+    position: absolute;
+    top: 47vh;
+    left: 87vw;
+    width: 211px; 
+    text-align: center;
+    transition: opacity 0.3s ease-out;
+    /* display: flex; */
+    justify-content: center;
+    align-items: center;
+}
+
+.victory--title {
+    flex: left;
+    margin: 0 auto 0 auto;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.victory--btn--container {
+    width: 0%;
+    position: relative;
+    left: calc(50% - 4vw);
+}
+
+.victory--btn{
+    width: 8vw;
+    height: 2.5vw;
+    border: none;
+    outline: none;
+    background: #2f2f2f;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 6px 20px -5px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.victory--btn p{
+    display: inline-block;
+    margin: auto 0;
+}
+
+#loading {
+    display: inline-block;
+    visibility: hidden;
+    width: 5px;
+    height: 5px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    -webkit-animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to { -webkit-transform: rotate(360deg); }
+  }
+  @-webkit-keyframes spin {
+    to { -webkit-transform: rotate(360deg); }
+  }
+
+.victory--button--active{
+    background: var(--wing-color);
+    transition: 1s;
+}
+
+.victory--button--active #loading{
+    visibility:visible;
+}
+
+.victory--button--active p{
+    margin-right: 2vw;
+    transition: 1s;
+}
+
+/* rules */
+.rules--container {
+    height: max-content;
+    width: 100%;
+    position: absolute;
+    top: 95vh;
+    margin: 0;
+    left: 0;
+
+}
+
+.rules--text {
+    margin: 0 4vw;
+    font-size: 1.15em;
+    font-family: 'Source Code Pro', monospace;
 }

@@ -1,3 +1,32 @@
+button {
+    border-radius: 7.5%;
+    width: 4vw;
+    height: 2vw;
+}
+
+.navbar--container {
+    position: fixed;
+    background-color: #444;
+    width: 100vw;
+    height: 5vh;
+    left: 0;
+    top: 0;
+    z-index: 99;
+}
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }
+ 
+::-webkit-scrollbar-thumb {
+    background-color: rgb(131, 30, 30);
+    border-radius: 100px;
+}
+
 .hidden {
-    display: none !important;
+    display: none;
 }
