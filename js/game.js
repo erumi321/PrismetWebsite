@@ -107,7 +107,6 @@ function checkGameBehaviour(doc){
     let playerStateField = "player" + playerNum + "State";
     currentPlayerState = doc.data()[playerStateField];
     if (doc.data()[playerStateField] >= 1.5){
-        console.log("DELETE", doc.data()[playerStateField], doc.data()[playerStateField] >= 2)
         populatePlayerDice(playerNum == 1? p1Dice: p2Dice, doc.data()[playerStateField] >= 2? true:false);
     }
 
@@ -117,13 +116,85 @@ function checkGameBehaviour(doc){
     }
 
     if (doc.data().player1State >= 2 && doc.data().player2State >= 2){
-        let points = [0, 0];
-        
-
+        let p1Values = [];
+        let p2Values = [];
 
         for(var i = 0; i < 3; i++){
-            let p1Score = calculateDragonScore(p1Dice.Dragons[i]);
-            let p2Score = calculateDragonScore(p2Dice.Dragons[i]);
+            p1Values.push(calculateDragonScore(p1Dice.Dragons[i]));
+            p2Values.push(calculateDragonScore(p2Dice.Dragons[i]));
+        }
+
+        p1Values.sort(function(a, b) {
+            return b - a;
+          });
+        p2Values.sort(function(a, b) {
+            return b - a;
+          });
+
+        let newP1Dice = {
+            Dragons: [
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                 {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 }
+            ],
+        };
+        let newP2Dice = {
+            Dragons: [
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 },
+                 {
+                    Value: -1,
+                    Buff1: -1,
+                    Buff2: -1,
+                    Buff3: -1,
+                 }
+            ],
+        };
+        
+        for(var i = 0; i < 3; i++){
+            let p1Value = calculateDragonScore(p1Dice.Dragons[i]);
+            let newIndex = p1Values.indexOf(p1Value);
+            newP1Dice.Dragons[newIndex] = p1Dice.Dragons[i];
+
+            let p2Value = calculateDragonScore(p2Dice.Dragons[i]);
+            newIndex = p2Values.indexOf(p2Value);
+            newP2Dice.Dragons[newIndex] = p2Dice.Dragons[i];
+        }
+
+        populatePlayerDice(playerNum == 1? newP1Dice: newP2Dice, doc.data()[playerStateField] >= 2? true:false);
+
+        populateOpponentDice(playerNum == 1? newP2Dice: newP1Dice);
+
+        let points = [0, 0];
+        
+        for(var i = 0; i < 3; i++){
+            let p1Score = calculateDragonScore(newP1Dice.Dragons[i]);
+            let p2Score = calculateDragonScore(newP2Dice.Dragons[i]);
 
             if (p1Score > p2Score){
                 points[0] ++;
@@ -144,10 +215,11 @@ function checkGameBehaviour(doc){
             document.getElementById("victory--title").innerText = "YOU TIE"
         }
 
+
+
     }
 
     if (doc.data()[playerStateField] == 3) {
-        console.log("start over");
         StartOverGame(document.getElementById("go--again"), false);
     }
 }
@@ -263,18 +335,13 @@ function populatePlayerDice(dice, doConfirmDelete)
 
         newDice.appendChild(newText);
 
-        console.log(draggable);
-
         if(draggable == true){
-            console.log(text, type, "testing", currentPlayerState, currentPlayerState <= 1.5);
             newDice.classList.add("draggableDie");
             newDice.setAttribute("draggable", currentPlayerState <= 1.5? "true": "false");
 
             newDice.addEventListener("dragstart", event => {
-                console.log("start");
                 newDice.setAttribute("previousparentid", newDice.parentNode.id);
                 event.dataTransfer.setData("text/plain",  newDice.id);
-                console.log(event.dataTransfer.getData("text/plain"))
                 
             });
         }else{
@@ -396,7 +463,6 @@ function RestartGame(){
 
         ]
     };
-    console.log("yo");
     db.collection("games").doc(gameID).set(newGame)
     .then(() =>{
         location.reload();
@@ -481,7 +547,6 @@ function RollDice(btn){
 
     for(var x = 1; x <= 3; x++)
     {
-        console.log(x)
         let randInt = getRandomInt(gameConfig.BuffMinAmount, gameConfig.BuffMaxAmount)
 
         let newDice = document.createElement("div");
@@ -513,11 +578,8 @@ function RollDice(btn){
         UpdateDragonBuffs(x);
 
         newDice.addEventListener("dragstart", event => {
-            console.log("start");
             newDice.setAttribute("previousparentid", newDice.parentNode.id);
             event.dataTransfer.setData("text/plain",  newDice.id);
-            console.log(event.dataTransfer.getData("text/plain"))
-            console.log(x)
         });
     }
 
@@ -644,8 +706,6 @@ for (const dropZone of document.querySelectorAll(".drop-zone")){
 
         const droppedElementId = e.dataTransfer.getData("text/plain");
         const droppedElement = document.getElementById(droppedElementId);
-
-        console.log("dropped", droppedElementId, droppedElement);
 
         let previousDropZone = document.getElementById(droppedElement.getAttribute("previousparentid"));
        
