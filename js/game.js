@@ -355,15 +355,15 @@ function populatePlayerDice(dice, doConfirmDelete)
 
     for(var i = 0; i < 3; i++)
     {
-        if(dice.Dragons[i].Value == -1){
-            continue;
-        }
         let dragonContainer =  document.getElementById("Dragonzone--" + (i + 1));
-        
         var child = dragonContainer.lastElementChild; 
         while (child) {
             dragonContainer.removeChild(child);
             child = dragonContainer.lastElementChild;
+        }
+
+        if(dice.Dragons[i].Value == -1){
+            continue;
         }
 
         createDice(dragonContainer, dice.Dragons[i].Value, "Dragon", false);
@@ -371,9 +371,6 @@ function populatePlayerDice(dice, doConfirmDelete)
         for (var x = 1; x <= 3; x++){
             let buff =  dice.Dragons[i]["Buff" + x];
 
-            if (buff == -1){
-                continue; 
-            }
             let buffContainer = document.getElementById("Buffzone--" + (i + 1) + "--" + x);
             if(buffContainer.children.length > 0){
                 var child = buffContainer.lastElementChild; 
@@ -382,6 +379,11 @@ function populatePlayerDice(dice, doConfirmDelete)
                     child = buffContainer.lastElementChild;
                 }
             }
+
+            if (buff == -1){
+                continue; 
+            }
+
 
             createDice(buffContainer, buff, "Buff", true);
 
